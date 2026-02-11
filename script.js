@@ -19,20 +19,44 @@ let gameState = {
 
 let wordBank = [];
 
+//edit it for #8 (add applySavedTheme)
 document.addEventListener('DOMContentLoaded', function() {
+    applySavedTheme();
     loadWordBank();
     generateKeyboard();
 });
 
+
+
 function toggleTheme() {
+    const body = document.body;
     const themeIcon = document.querySelector('.theme-icon');
-    
-    if (themeIcon.textContent === '🌙') {
+
+    const isDark = body.classList.toggle('dark-mode');
+
+    // Persist
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    // Icon rule: 🌙 for light mode, ☀️ for dark mode
+    themeIcon.textContent = isDark ? '☀️' : '🌙';
+}
+
+//new function to fix issue #8 
+
+function applySavedTheme() {
+    const saved = localStorage.getItem('theme') || 'light';
+    const body = document.body;
+    const themeIcon = document.querySelector('.theme-icon');
+
+    if (saved === 'dark') {
+        body.classList.add('dark-mode');
         themeIcon.textContent = '☀️';
     } else {
+        body.classList.remove('dark-mode');
         themeIcon.textContent = '🌙';
     }
 }
+
 
 function switchTab(tabName) {
     const tabs = document.querySelectorAll('.tab-content');
