@@ -277,7 +277,7 @@ body {
 }
 
 .game-status.winner {
-    background: #f8d7da;
+    background: #d4edda;
     border: 2px solid #f5c6cb;
 }
 
@@ -286,7 +286,7 @@ body {
 }
 
 .game-status.loser {
-    background: #d4edda;
+    background: #f8d7da;
     border: 2px solid #c3e6cb;
 }
 
