@@ -227,32 +227,46 @@ function startGame() {
 
     document.getElementById('gameArea').style.display = 'block';
 
+    gameState.currentPlayer = 2; // so nextRound switches to player 1
+
     nextRound();
 }
 
 
 function nextRound() {
+
+    // 1) Switch player at the start of every new round
+    gameState.currentPlayer = (gameState.currentPlayer === 1) ? 2 : 1;
+
+    // 2) Validate word bank
     if (wordBank.length === 0) {
         alert('No words in the word bank! Add some words first.');
         return;
     }
-    
+
+    // 3) Reset round state
     gameState.guessedLetters = [];
     gameState.wrongGuesses = 0;
     gameState.gameActive = true;
-    
+
+    // 4) Pick a new word
     const randomIndex = Math.floor(Math.random() * wordBank.length);
     gameState.currentWord = wordBank[randomIndex];
-    
+
+    // 5) Reset UI
     document.getElementById('gameStatus').classList.remove('show');
     document.getElementById('gameStatus').className = 'game-status';
+
     resetHangman();
     resetKeyboard();
+
+    // 6) Refresh UI values
     updateWordDisplay();
     updateWrongLetters();
     updateLives();
-    updateCurrentPlayer();
+    updateCurrentPlayer(); // this updates the UI highlight/name
 }
+
 
 function guessLetter(letter) {
     if (!gameState.gameActive) return;
@@ -371,24 +385,27 @@ function checkGameStatus() {
 
 function gameWon() {
     gameState.gameActive = false;
-    
+
+    // Award points to the CURRENT player (the one who guessed the word)
     if (gameState.currentPlayer === 1) {
-        gameState.player2.score += 10;
-        document.getElementById('score2').textContent = gameState.player2.score;
-    } else {
         gameState.player1.score += 10;
         document.getElementById('score1').textContent = gameState.player1.score;
+    } else {
+        gameState.player2.score += 10;
+        document.getElementById('score2').textContent = gameState.player2.score;
     }
-    
+
     const statusDiv = document.getElementById('gameStatus');
     const statusMsg = document.getElementById('statusMessage');
-    
-    const winnerName = gameState.currentPlayer === 1 ? 
-        gameState.player2.name : gameState.player1.name;
-    
+
+    const winnerName = (gameState.currentPlayer === 1)
+        ? gameState.player1.name
+        : gameState.player2.name;
+
     statusMsg.textContent = `🎉 ${winnerName} won! The word was: ${gameState.currentWord}`;
     statusDiv.classList.add('show', 'winner');
 }
+
 
 function gameLost() {
     gameState.gameActive = false;
@@ -402,5 +419,5 @@ function gameLost() {
     statusMsg.textContent = `😢 ${currentPlayerName} lost! The word was: ${gameState.currentWord}`;
     statusDiv.classList.add('show', 'loser');
     
-    gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
+    //gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
 }
