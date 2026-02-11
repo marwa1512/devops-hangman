@@ -235,9 +235,11 @@ function updateWrongLetters() {
 
 
 function updateLives() {
-    const livesLeft = gameState.maxWrong - gameState.wrongGuesses + 1;
-    document.getElementById('livesLeft').textContent = livesLeft;
+    //after edit 
+    const livesLeft = gameState.maxWrong - gameState.wrongGuesses;
+    document.getElementById('livesLeft').textContent = Math.max(0, livesLeft);
 }
+
 
 function updateHangman() {
     const parts = ['head', 'body', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'];
