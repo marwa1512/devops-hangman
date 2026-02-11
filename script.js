@@ -133,6 +133,7 @@ function generateKeyboard() {
 }
 
 function startGame() {
+    // this will colse issue #1 
     const p1Name = document.getElementById('player1Name').value.trim();
     const p2Name = document.getElementById('player2Name').value.trim();
 
