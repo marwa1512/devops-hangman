@@ -68,21 +68,47 @@ function switchTab(tabName) {
     document.getElementById(tabName).classList.add('active');
     event.target.classList.add('active');
 }
-
+//edit for issue #10
 function loadWordBank() {
-    const stored = localStorage.getItem('wordBank');
+    let stored = localStorage.getItem('wordBank');
+
+    // Migration (in case older key exists)
+    if (!stored) {
+        const old = localStorage.getItem('devopsWords');
+        if (old) {
+            localStorage.setItem('wordBank', old);
+            localStorage.removeItem('devopsWords');
+            stored = old;
+        }
+    }
+
     if (stored) {
         wordBank = JSON.parse(stored);
     } else {
         wordBank = [...defaultWords];
         saveWordBank();
     }
+
     displayWordBank();
 }
 
-function saveWordBank() {
-    localStorage.setItem('devopsWords', JSON.stringify(wordBank));
+// i will add this for issue #10 
+function isValidWord(word, ignoreIndex = -1) {
+    const w = word.trim().toUpperCase();
+
+    if (!w) return { ok: false, msg: 'Word cannot be empty.' };
+    if (!/^[A-Z]+$/.test(w)) return { ok: false, msg: 'Only letters A-Z are allowed.' };
+
+    const duplicateIndex = wordBank.findIndex((x, i) => x === w && i !== ignoreIndex);
+    if (duplicateIndex !== -1) return { ok: false, msg: 'Duplicate words are not allowed.' };
+
+    return { ok: true, value: w };
 }
+
+function saveWordBank() {
+    localStorage.setItem('wordBank', JSON.stringify(wordBank));
+}
+
 
 function displayWordBank() {
     const wordList = document.getElementById('wordList');
@@ -114,32 +140,52 @@ function displayWordBank() {
         wordList.appendChild(wordItem);
     });
 }
-
+//update for issue #10
 function addWord() {
     const input = document.getElementById('newWord');
-    const word = input.value.trim().toUpperCase();
+    const check = isValidWord(input.value);
 
-    wordBank.push(word);
+    if (!check.ok) {
+        alert(check.msg);
+        return;
+    }
+
+    wordBank.push(check.value);
     input.value = '';
     saveWordBank();
     displayWordBank();
 }
 
+// update for issue #10 
 function editWord(index) {
-    const newWord = prompt('Edit word:', wordBank[index]);
-    if (newWord) {
-        wordBank.splice(index, 1);
-        saveWordBank();
-        displayWordBank();
+    const current = wordBank[index];
+    const newWord = prompt('Edit word:', current);
+
+    if (newWord === null) return; // user cancelled
+
+    const check = isValidWord(newWord, index);
+    if (!check.ok) {
+        alert(check.msg);
+        return;
     }
+
+    wordBank[index] = check.value;
+    saveWordBank();
+    displayWordBank();
 }
 
+
+// update for issue #10
 function deleteWord(index) {
-    if (confirm('Are you sure you want to delete this word?')) {
-        saveWordBank();
-        displayWordBank();
-    }
+    const word = wordBank[index];
+
+    if (!confirm(`Delete "${word}"?`)) return;
+
+    wordBank.splice(index, 1);
+    saveWordBank();
+    displayWordBank();
 }
+
 
 function generateKeyboard() {
     const keyboard = document.getElementById('keyboard');
